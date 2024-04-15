@@ -1,0 +1,64 @@
+Airflow - open-source tool to programmatically author, schedule and monitor workflows
+- complex computation workflows and data processing pipelines orchestration
+- job scheduler, where each job consists with multiple taks connected by dependencies
+- dependency defines which task will run first
+- platform to schedule tasks in a workflow
+- connect to external data sources
+- workflows defined as Python Code
+
+- every workflow is written in code and defined as Direct Acyclic Graphs (DAG): tasks are nodes and edges are dependencies between tasks
+
+
+- Taskflow API
+- PostgreSQL
+- Sensors
+- Hooks
+
+
+UI to display the status of pipeline
+Command line interface
+
+
+Problems of cron-alike schedulers that Apache Airflow is aimed to solve
+- Error handling
+- Trace the changes made to scheduler jobs
+- No tracking - no centralized scheduler, no connection between jobs running on multiple machines
+- Ability to run dependant tasks in sync
+- Historical data to re-run jobs later
+
+
+Terminology
+DAG, Directed Acyclic Graph - unidirectional, acyclic graph connecting nodes (tasks) with edges (dependencies)
+Operator - predefined task in a workflow, what gets to be done when DAG runs
+Task - instantiated operator, when operator is assigned worker, it's a task
+Workflow = Pipeline = DAG in essence (can be used interchangeably), sequence of tasks
+XComs - system to pass data between tasks, where task can push & pull small bits on metadata
+
+
+Architecture
+Scheduler - manager, that keeps an eye on resources, keeping dependencies between tasks, rerun failed tasks
+Executor - Scheduler assigns Executor to run workflow, so execute tasks
+1. SequentialExecutor - default, executes tasks sequentially in single process. great for  testing/debugging
+2. LocalExecutor - might run few workflows in parallel. right for small/medium workflows
+3. CeleryExecutor - can coordinate tasks execution across multiple worker nodes, for large workflows
+4. KubernetesExecutor - uses K8S for production containerized workflows, for better resource utilization & scalability
+Workers - instances of executor
+Webserver - trigger and debug DAGS with user interface
+Metadata DB - stores the state of every workflow
+DAG directory - stores workflows implemented in Python code as DAGs
+
+
+Install
+1. With docker or docker-compose
+docker pull apache/airflow
+2. Using PyPi
+pyenv activate airflow
+pip install "apache-airflow[celery]==2.5.3" --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-2.5.3/constraints-3.7.txt"
+airflow -h
+airflow cheat-sheet
+airflow info
+
+Operators
+- Sensor - triggered on event, for example looking into precense of files in the folder - once file is there, the operator is executed
+- Transfer - for example, transfer data from Postgres to Hive
+- Action operator/Operator - regular type - Bash, Python etc
